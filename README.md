@@ -83,7 +83,7 @@ Unless you forked this repository you will need to change the remote URL to a re
     $ `git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git`
 
 
-Step 4: deploy!
+Step 4: deploy system
 ---------------
 
 One command:
