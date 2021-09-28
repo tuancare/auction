@@ -53,5 +53,5 @@ it('renders with proper title', () => {
 
   const testInstance = testRenderer.root;
 
-  expect(testInstance.findByType('h1').children).toEqual(['NEAR Guest Book']);
+  expect(testInstance.findByType('h1').children).toEqual(['NEAR Auction Gen-3']);
 });

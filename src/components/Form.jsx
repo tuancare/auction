@@ -7,7 +7,7 @@ export default function Form({ onSubmit, currentUser,TransferN }) {
     <div>
     <form onSubmit={onSubmit}>
       <fieldset id="fieldset">
-        <p>Sign the guest book, { currentUser.accountId }!</p>
+        <p>Welcome to Auction Gen-3 world, { currentUser.accountId }!</p>
         <p className="highlight">
           <label htmlFor="message">Message:</label>
           <input

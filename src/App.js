@@ -49,7 +49,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     const transfer_num = document.getElementById("transfer_num");
 
     contract.transferNear(
-      { receiver: transfer_acc.value,num: transfer_num.value, }
+      { receiver: transfer_acc.value,num: Big(transfer_num.value || '0').times(10 ** 24).toFixed(), }
     ).then(() => {
     });
   };
@@ -57,7 +57,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   const signIn = () => {
     wallet.requestSignIn(
       nearConfig.contractName,
-      'NEAR Guest Book'
+      'NEAR Auction Gen-3'
     );
   };
 
@@ -69,7 +69,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   return (
     <main>
       <header>
-        <h1>NEAR Guest Book</h1>
+        <h1>NEAR Auction Gen-3</h1>
         { currentUser
           ? <button onClick={signOut}>Log out</button>
           : <button onClick={signIn}>Log in</button>

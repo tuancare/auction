@@ -32,6 +32,6 @@ export function getMessages(): PostedMessage[] {
   return result;
 }
 
-export function transferNear(receiver: string, num: i32): void {
-  let promise = ContractPromiseBatch.create(receiver).transfer(u128.from(num))
+export function transferNear(receiver: string, num: u128): void {  
+  let promise = ContractPromiseBatch.create(receiver).transfer(num)
 }
