@@ -8,8 +8,8 @@ const items = [
         text: 'Home'
     },
     {
-        path: '/about',
-        text: 'About'
+        path: '/products',
+        text: 'Products'
     },
     {
         path: '/contact',
