@@ -13,6 +13,10 @@ export default function NewProduct({ onSubmit}) {
           <input autoComplete="off" autoFocus id="productcode" required />
         </p>
         <p className="highlight">
+          <label htmlFor="message">Name:</label>
+          <input autoComplete="off" autoFocus id="productname" required />
+        </p>
+        <p className="highlight">
           <label htmlFor="message">Description:</label>
           <input autoComplete="off"  id="productdesc" required />
         </p>

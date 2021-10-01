@@ -11,18 +11,28 @@ export default function Home() {
         window.location.href="/account";
     }
     const [products, setProducts] = useState([]);
-    useEffect(() => {
-      // TODO: don't just fetch once; subscribe!
-      contract.getProducts().then(products => {setProducts(products); });
+    useEffect(() => {      
+      contract.getItems().then(products => {
+        setProducts(products); 
+        console.log(products);
+      });
     }, []);
-    function onBid(id){
-      //e.preventDefault();
-      console.log(id)
-      window.contract.bidProduct(
-        { }
+    function onJoinItem(item_code,base_price){      
+      console.log('Join item to bid: '+base_price)
+      window.contract.joinItem(
+        { item_code:item_code},
+        BOATLOAD_OF_GAS,
+        Big(base_price).div(100).toFixed()
       ).then(() => {          
-          fieldset.disabled = false;
-          productcode.focus();
+          //do nothing 
+      });
+    };
+    function onCleanJoiner(item_code){      
+      console.log('Clean all joiners:'+item_code)
+      window.contract.cleanJoiner(
+        { item_code:item_code}
+      ).then(() => {          
+          //do nothing 
       });
     };
     return (
@@ -32,9 +42,9 @@ export default function Home() {
         <div className="products-container">
           {products.map((product, i) =>
           
-          <div key={i} className={i+ " products-item "+ product.item_id} >
-              <div className="products-item-id">
-              {product.item_id}
+          <div key={i} className={i+ " products-item "+ product.item_code} >              
+              <div className="products-item-name">
+              {product.item_name} - ({product.item_code})
               </div>
               <div className="products-item-desc">
               {product.desc}
@@ -43,12 +53,13 @@ export default function Home() {
                 <img src={product.url}/>
               </div>
               <div className="products-item-price">
-              {product.base_price}
+              {Big(product.base_price || '0').div(10 ** 24).toFixed()}(N)
               </div>
               <div className="products-item-bidders">
               {product.list_joiners}
               </div>
-              <button id={"btn-bid-"+i} href="#" onClick={() => { onBid(i) }}> Bid</button>
+              <button id={"btn-bid-"+i} href="#" onClick={() => { onJoinItem(product.item_code,product.base_price) }}> Join to Bid</button>
+              <button className="admin" id={"btn-bid-"+i} href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>
           </div>
           )}
           </div>

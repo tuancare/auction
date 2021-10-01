@@ -1,4 +1,4 @@
-import { context, u128, PersistentSet,PersistentVector } from "near-sdk-as";
+import { context, u128, PersistentSet,PersistentVector,PersistentUnorderedMap } from "near-sdk-as";
 
 export enum ItemStatus {
   Init,
@@ -6,26 +6,6 @@ export enum ItemStatus {
   Close,
   Refunded  
 }
-
-/** 
- * Exporting a new class PostedMessage so it can be used outside of this file.
- */
-@nearBindgen
-export class PostedMessage {
-  premium: boolean;
-  sender: string;
-  constructor(public text: string) {
-    this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
-    this.sender = context.sender;
-  }
-}
-/**
- * collections.vector is a persistent collection. Any changes to it will
- * be automatically saved in the storage.
- * The parameter to the constructor needs to be unique across a single contract.
- * It will be used as a prefix to all keys required to store data in the storage.
- */
-export const messages = new PersistentVector<PostedMessage>("m");
 
 /** 
  * Exporting a new class AuctionContract so it can be used outside of this file.
@@ -51,17 +31,24 @@ export class AuctionContract {
  */
  @nearBindgen
  export class JoinerBid {
-   joiner: string;
-   bid_price: u128;
-   bid_time:u128;
+  bid_id:i32; 
+  item_code:string;
+  joiner: string;
+  bid_price: u128;
+  bid_time:u128;
    constructor(
+    bid_id:i32,
+    item_code:string,
     joiner: string,
     bid_price: u128,
     bid_time:u128
    ) {
-     this.joiner = joiner;
-     this.bid_price = bid_price;
-     this.bid_time = bid_time;
+    this.bid_id = bid_id;
+    this.item_code = item_code;
+    this.joiner = joiner;
+    this.joiner = joiner;
+    this.bid_price = bid_price;
+    this.bid_time = bid_time;
    }
  }
  /** 
@@ -69,25 +56,49 @@ export class AuctionContract {
  */
 @nearBindgen
 export class AuctionItem {
-  item_id: string;
+  item_code: string;
+  item_name: string;
   desc: string;
   url: string;
   base_price:u128;
   status:ItemStatus;
   start_time:u128;
   end_time:u128;
-  list_joiners:PersistentSet<string>;//array acound id
-  joiner_bids:PersistentVector<JoinerBid>;
+  list_joiners:string[];//array acound id  
   constructor(
-    item_id: string,
+    item_code: string,
+    item_name: string,
     desc: string,
     url: string,
     base_price:u128
   ) {
-    this.item_id = item_id;
+    this.item_code = item_code;
+    this.item_name = item_name;
     this.desc = desc;
     this.url = url;
-    this.base_price = base_price;    
+    this.base_price = base_price;  
+    this.list_joiners  =[];
+  }
+
+  public isJoined(): boolean {
+    const index = this.list_joiners.indexOf(context.sender);
+    if (index == -1) {
+      return false;
+    }
+    return true;
+  }
+
+  public join(): AuctionItem {
+    if (!this.isJoined()) {
+      this.list_joiners.push(context.sender);
+    }
+    return this;
+  }
+
+  //TODO: just admin can do that 
+  public cleanJoiner(): AuctionItem {
+    this.list_joiners=[];    
+    return this;
   }
 }
 /**
@@ -96,4 +107,5 @@ export class AuctionItem {
  * The parameter to the constructor needs to be unique across a single contract.
  * It will be used as a prefix to all keys required to store data in the storage.
  */
-export const list_auction_items = new PersistentVector<AuctionItem>("i");
+export const list_auction_items = new PersistentUnorderedMap<string, AuctionItem>("auc-item");
+export const joiner_bids = new PersistentUnorderedMap<i32, JoinerBid>("joiner-bid")
