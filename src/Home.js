@@ -15,14 +15,19 @@ export default function Home() {
       contract.getItems().then(products => {
         setProducts(products); 
         console.log(products);
+        console.log(window.currentUser);
       });
     }, []);
-    function onJoinItem(item_code,base_price){      
-      console.log('Join item to bid: '+base_price)
+    function onJoinItem(item_code,base_price,list_joiners){      
+      console.log('Join item to bid: '+item_code)
+      if (isJoined(window.currentUser.accountId,list_joiners)){
+        console.log('You are already joined')
+        return;
+      }
       window.contract.joinItem(
         { item_code:item_code},
         BOATLOAD_OF_GAS,
-        Big(base_price).div(100).toFixed()
+        Big(base_price).div(10).plus(Big(5*10**23)).toFixed() //10% pre-paid + 0.5N fee to join        
       ).then(() => {          
           //do nothing 
       });
@@ -35,6 +40,12 @@ export default function Home() {
           //do nothing 
       });
     };
+    function isJoined(accountId,list_joiners){
+      if (list_joiners.indexOf(window.currentUser.accountId)>-1){
+        return true;
+      }
+      return false;
+    }
     return (
         <main>
         <header>            
@@ -58,8 +69,17 @@ export default function Home() {
               <div className="products-item-bidders">
               {product.list_joiners}
               </div>
-              <button id={"btn-bid-"+i} href="#" onClick={() => { onJoinItem(product.item_code,product.base_price) }}> Join to Bid</button>
-              <button className="admin" id={"btn-bid-"+i} href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>
+              <button 
+                id={"btn-bid-"+i} 
+                onClick={() => { onJoinItem(product.item_code,product.base_price,product.list_joiners) }}
+                title="You will be charged 0.5N as fee, plus 10% of base price as prepaid (will be refunded 10% if not win the item)"
+              > 
+                Join to Bid
+              </button>
+              { window.currentUser.accountId== product.owner? 
+                <button className="admin" id={"btn-bid-"+i} href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>:
+              ''
+              }
           </div>
           )}
           </div>

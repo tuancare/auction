@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Big from 'big.js';
+import DateTimePicker from 'react-datetime-picker';
 
 export default function NewProduct({ onSubmit}) {
+  const [value, onChange] = useState(new Date());
+  
   return (
     <div>
     <form onSubmit={onSubmit}>
@@ -33,6 +36,16 @@ export default function NewProduct({ onSubmit}) {
             step="0.01"
             type="number" required />
         </p>
+        <p className="highlight">
+          <label htmlFor="message">Start time:</label>
+          
+        </p>
+        <DateTimePicker id="start_time"
+            onChange={onChange}
+            value={value}
+          />
+          <input type="hidden" value={Date.parse(value)} id="starttime"/>
+        
         <button type="submit">
           Save
         </button>
