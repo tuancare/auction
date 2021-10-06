@@ -64,6 +64,7 @@ export class AuctionItem {
   status:ItemStatus;
   start_time:u128;
   end_time:u128;
+  len_time:u128;
   list_joiners:string[];//array acound id  
   owner:string;
   constructor(
@@ -72,7 +73,9 @@ export class AuctionItem {
     desc: string,
     url: string,
     base_price:u128,
-    owner:string
+    owner:string,
+    start_time:u128,
+    len_time:u128
   ) {
     this.item_code = item_code;
     this.item_name = item_name;
@@ -81,6 +84,8 @@ export class AuctionItem {
     this.base_price = base_price;  
     this.list_joiners  =[];
     this.owner=owner;
+    this.start_time=start_time;
+    this.len_time=len_time;
   }
 
   public isJoined(): boolean {

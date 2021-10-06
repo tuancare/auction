@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Switch, Route } from "react-router-dom";
 import Home from "./Home";
 import Products from "./Products";
+import ProductDetail from "./ProductDetail";
 import Contact from "./Contact";
 import Login from "./Login";
 import Menu from "./Menu";
@@ -33,7 +34,7 @@ export default function Layout({ contract, currentUser, nearConfig, wallet }) {
                     Auction
                 </div>
                 <div className="header-breadcumbs">
-                    best buy, best bid
+                    best bid, best buy
                 </div>
                 <div className="header-account">
                     {!window.currentUser
@@ -51,6 +52,7 @@ export default function Layout({ contract, currentUser, nearConfig, wallet }) {
                         <Route path="/products" component={Products} />
                         <Route path="/contact" component={Contact} />
                         <Route path="/account" component={Login} /> 
+                        <Route path="/pdp/:productcode" component={ProductDetail} /> 
                         <Route path="/" component={Home} />     
                                     
                     </Switch>

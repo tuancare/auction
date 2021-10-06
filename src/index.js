@@ -32,9 +32,9 @@ async function initContract() {
   // Initializing our contract APIs by contract name and configuration
   const contract = await new nearAPI.Contract(walletConnection.account(), nearConfig.contractName, {
     // View methods are read-only – they don't modify the state, but usually return some value
-    viewMethods: ['getMessages','getItems','getCountJoiner','getJoinerBids',''],
+    viewMethods: ['getMessages','getItems','getCountJoiner','getJoinerBids','getItemByCode','getJoinerBidById'],
     // Change methods can modify the state, but you don't receive the returned value when called
-    changeMethods: ['joinItem','bidOnItem','addNewItem','bidProduct','cleanJoiner'],
+    changeMethods: ['joinItem','bidOnItem','addNewItem','bidProduct','cleanJoiner','cleanItems','cleanJoinerBids'],
     // Sender is the account ID to initialize transactions.
     // getAccountId() will return empty string if user is still unauthorized
     sender: walletConnection.getAccountId()

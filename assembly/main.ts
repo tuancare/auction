@@ -10,11 +10,11 @@ export const dAPP_OWNER:string='tuanlv.testnet';
  * NOTE: This is a change method. Which means it will modify the state.\
  * But right now we don't distinguish them with annotations yet.
  */
- export function addNewItem(productcode:string,productname:string, productdesc:string,producturl:string,productprice:u128 ): void {
+ export function addNewItem(productcode:string,productname:string, productdesc:string,producturl:string,productprice:u128,start_time:u128,len_time:u128 ): void {
   logging.log("Add new item: ".concat(productname)+"-".concat(productcode));
   assert(!list_auction_items.contains(productcode), "Item with this code is exists!");  
   assert((dAPP_OWNER==context.sender), "You have no right");
-  const aucitem= new AuctionItem(productcode,productname,productdesc,producturl,productprice,dAPP_OWNER);
+  const aucitem= new AuctionItem(productcode,productname,productdesc,producturl,productprice,dAPP_OWNER,start_time,len_time);
   
   // Adding the item to collection
   list_auction_items.set(productcode,aucitem);
@@ -25,6 +25,16 @@ export const dAPP_OWNER:string='tuanlv.testnet';
 export function getItems(): AuctionItem[] {
   logging.log("Get all items");   
  return list_auction_items.values();
+}
+
+export function getItemByCode(item_code:string ): AuctionItem | null {
+  logging.log("Get item:".concat(item_code));   
+  assert(list_auction_items.contains(item_code), "Item is not existed");
+  const auction_item = list_auction_items.get(item_code);
+  if (auction_item) {
+    return auction_item;
+  }
+  return null;
 }
 
 export function joinItem(item_code:string ): AuctionItem | null {
@@ -84,17 +94,24 @@ export function getJoinerBids(item_code: string): JoinerBid[] {
 
 export function bidOnItem(item_code: string, bid_price: u128): JoinerBid[] {
   logging.log("Bid on the item: ".concat(item_code));
-  
+  logging.log("context.blockTimestamp : ".concat(u128.from(context.blockTimestamp).toString()));
   assert(list_auction_items.contains(item_code), "Item is not existed");
-  assert((dAPP_OWNER==context.sender), "You are the owner");
+  assert(!(dAPP_OWNER==context.sender), "You are the owner");
   const auction_item = list_auction_items.get(item_code);
   if (auction_item) {
-    let bidId = storage.getPrimitive<i32>("bidId", 0);
-    const joiner_bid = new JoinerBid(bidId,item_code,context.sender, bid_price, u128.from(context.blockTimestamp));
-    joiner_bids.set(joiner_bid.bid_id, joiner_bid);
+    //check if the item is in bid time or not
+    const end_time = u128.add(auction_item.start_time, auction_item.len_time);
+    if (u128.gt(u128.from(context.blockTimestamp), end_time) ||u128.gt(auction_item.start_time,u128.from(context.blockTimestamp))) {
+      logging.log("Not in the bid period: ".concat(item_code));
+    }
+    else {
+      let bidId = storage.getPrimitive<i32>("bidId", 0);
+      const joiner_bid = new JoinerBid(bidId,item_code,context.sender, bid_price, u128.from(context.blockTimestamp));
+      joiner_bids.set(joiner_bid.bid_id, joiner_bid);
 
-    bidId = bidId + 1;
-    storage.set<i32>("bidId", bidId);
+      bidId = bidId + 1;
+      storage.set<i32>("bidId", bidId);
+    }
   }
 
   let results: JoinerBid[] = [];
@@ -108,4 +125,27 @@ export function bidOnItem(item_code: string, bid_price: u128): JoinerBid[] {
   }
 
   return results;
+}
+
+
+export function getJoinerBidById(bidId:i32 ): JoinerBid | null {
+  logging.log("Get bid:".concat(bidId.toString()));   
+  assert(joiner_bids.contains(bidId), "Bid is not existed");
+  const joinerbid = joiner_bids.get(bidId);
+  if (joinerbid) {
+    return joinerbid;
+  }
+  return null;
+}
+
+export function cleanItems(): void {
+  logging.log("Remove all items");
+  list_auction_items.clear();
+
+}
+
+export function cleanJoinerBids(): void {
+  logging.log("Remove all Joiner bids");
+  joiner_bids.clear();
+
 }

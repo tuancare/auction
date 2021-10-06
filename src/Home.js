@@ -14,8 +14,7 @@ export default function Home() {
     useEffect(() => {      
       contract.getItems().then(products => {
         setProducts(products); 
-        console.log(products);
-        console.log(window.currentUser);
+        console.log(products);        
       });
     }, []);
     function onJoinItem(item_code,base_price,list_joiners){      
@@ -38,6 +37,7 @@ export default function Home() {
         { item_code:item_code}
       ).then(() => {          
           //do nothing 
+          
       });
     };
     function isJoined(accountId,list_joiners){
@@ -55,7 +55,7 @@ export default function Home() {
           
           <div key={i} className={i+ " products-item "+ product.item_code} >              
               <div className="products-item-name">
-              {product.item_name} - ({product.item_code})
+              <a href={"/pdp/code?productcode="+product.item_code}>{product.item_name} - ({product.item_code})</a>
               </div>
               <div className="products-item-desc">
               {product.desc}

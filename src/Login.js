@@ -12,6 +12,25 @@ export default function Home() {
         window.wallet.signOut();
         window.location.replace(window.location.origin + window.location.pathname);
       };
+
+      function onClearItems(){      
+        console.log('Clean all items')
+        window.contract.cleanItems(
+          { }
+        ).then(() => {          
+            //do nothing 
+            console.log('Done - Clean all items')
+        });
+      };
+      function onClearBids(){      
+        console.log('Clean all joiner bids')
+        window.contract.cleanJoinerBids(
+          {}
+        ).then(() => {          
+            //do nothing 
+            console.log('Done - Clean all joiner bids')
+        });
+      };
     return (
         <main>
             <header>
@@ -25,7 +44,12 @@ export default function Home() {
                 : <button onClick={signIn}>Log in</button>
                 }
             </header>      
-      
+            <button type="button" onClick={onClearItems}>
+                Clear all items
+            </button>
+            <button type="button" onClick={onClearBids}>
+            Clear all Bids
+            </button>
         </main> 
     );
 }

@@ -36,15 +36,18 @@ export default function NewProduct({ onSubmit}) {
             step="0.01"
             type="number" required />
         </p>
-        <p className="highlight">
+        <div className="highlight">
           <label htmlFor="message">Start time:</label>
-          
-        </p>
-        <DateTimePicker id="start_time"
+          <DateTimePicker id="start_time"
             onChange={onChange}
             value={value}
           />
           <input type="hidden" value={Date.parse(value)} id="starttime"/>
+        </div>
+        <p className="highlight">
+          <label htmlFor="message">Period (mins):</label>
+          <input autoComplete="off"  id="lentime" required />
+        </p>
         
         <button type="submit">
           Save
