@@ -99,6 +99,8 @@ export function bidOnItem(item_code: string, bid_price: u128): JoinerBid[] {
   assert(!(dAPP_OWNER==context.sender), "You are the owner");
   const auction_item = list_auction_items.get(item_code);
   if (auction_item) {
+    //TODO: CHECK BALLANCE
+    //
     //check if the item is in bid time or not
     const end_time = u128.add(auction_item.start_time, auction_item.len_time);
     if (u128.gt(u128.from(context.blockTimestamp), end_time) ||u128.gt(auction_item.start_time,u128.from(context.blockTimestamp))) {

@@ -5,7 +5,7 @@ body {
 .app {
     display: flex;
     min-height: 100vh;
-
+    padding-top:50px;
     &__sidebar {
         flex: 0 0 20%;
         background-color: #b2daf9;
@@ -20,6 +20,10 @@ body {
     height: 50px;
     display: flex;
     background: #d15454;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
     .header-logo {
         flex: 0 0 20%;        
         color: #fff;
