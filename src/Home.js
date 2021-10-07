@@ -12,11 +12,18 @@ export default function Home() {
     }
     const [products, setProducts] = useState([]);
     useEffect(() => {      
+      getItems();
+      return () => {
+        setProducts({});
+      };
+    }, []);
+    const getItems = () => {
       contract.getItems().then(products => {
         setProducts(products); 
         console.log(products);        
       });
-    }, []);
+    }
+    
     function onJoinItem(item_code,base_price,list_joiners){      
       console.log('Join item to bid: '+item_code)
       if (isJoined(window.currentUser.accountId,list_joiners)){

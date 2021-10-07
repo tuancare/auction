@@ -20,20 +20,38 @@ export default function Home() {
     let productcode=query.get("productcode");
     
            
-    useEffect(() => {      
-        contract.getItemByCode({ item_code:productcode}
-            ).then(product => {
-          setProduct(product); 
-          console.log(product);          
-        });
-      }, []);
-    useEffect(() => {      
-        contract.getJoinerBids({ item_code:productcode}).then(list_bids => {
-            setList_bids(list_bids); 
-          console.log(list_bids);        
-        });
-      }, []);
+    useEffect(() => {
+      getItem();
+      return () => {
+        setProduct({});
+      };
+    }, []);
+    useEffect(() => {
+      getJoinerBids();
+      return () => {
+        setList_bids({});
+      };
+    }, []);    
     
+  const getItem = () => {
+      contract.getItemByCode({ item_code:productcode}
+          ).then(product => {
+        setProduct(product); 
+        console.log(product);          
+      });
+    }
+    
+  const getJoinerBids = () => {
+      contract.getJoinerBids({ item_code:productcode}).then(list_bids => {
+        setList_bids(list_bids); 
+      console.log(list_bids);
+      const tm=Big(list_bids[0].bid_time || '0').div(10**9).round(0,0).times(10**3).toFixed();
+      console.log(tm);
+      var t = (new Date());
+      t.setSeconds( tm );        
+      console.log(t);
+    });
+    }
       const onBid = (e) => {
         e.preventDefault();
     
@@ -72,7 +90,7 @@ export default function Home() {
               </div>
               
               { window.currentUser.accountId== product.owner? 
-                <button className="admin" id={"btn-bid-"+i} href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>:
+                <button className="admin" id="btn-clean" href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>:
               ''
               }
           </div>
@@ -91,17 +109,19 @@ export default function Home() {
             </button>
         </div>
         <div className="joiner-bid-list">
-        {list_bids.map((joiner_bid, i) =>
+        {list_bids.map((joiner_bid, j) =>
           
-          <div key={i} className={i+ " products-item "+ joiner_bid.bid_id} >              
+          <div key={j} className={j+ " products-item "+ joiner_bid.bid_id} >              
               <div className="bid-joiner-name">
               {joiner_bid.joiner}
               </div>
-              <div className="bid-joiner-price">
-              {joiner_bid.bid_price}
+              <div className="bid-joiner-price">              
+              {Big(joiner_bid.bid_price || '0').div(10 ** 24).toFixed()}(N)
               </div>
               <div className="bid-joiner-time">
-              {joiner_bid.bid_time}
+              {                
+                (new Date(Big(joiner_bid.bid_time || '0').div(10**6))).toDateString()
+              }
               </div>
               
           </div>
