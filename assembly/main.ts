@@ -41,8 +41,14 @@ export function joinItem(item_code:string ): AuctionItem | null {
   logging.log("Join on item to bid: ".concat(item_code));
   assert(list_auction_items.contains(item_code), "Item is not existed");
   assert(!(dAPP_OWNER==context.sender), "You are the owner");
+  
   const auction_item = list_auction_items.get(item_code);
   if (auction_item) {
+    //check expired
+    //check if the item is in bid time or expired
+    const end_time = u128.add(auction_item.start_time, auction_item.len_time);
+    assert( !(u128.gt(u128.from(context.blockTimestamp), end_time)), "This auction session is ended");
+
     const updated = auction_item.join();
     list_auction_items.set(updated.item_code, updated);
     return auction_item;
@@ -98,22 +104,20 @@ export function bidOnItem(item_code: string, bid_price: u128): JoinerBid[] {
   assert(list_auction_items.contains(item_code), "Item is not existed");
   assert(!(dAPP_OWNER==context.sender), "You are the owner");
   const auction_item = list_auction_items.get(item_code);
-  if (auction_item) {
-    //TODO: CHECK BALLANCE
-    //
+  if (auction_item) {    
+    //TODO: check whether user joined to bid or not
+    assert((auction_item.list_joiners.indexOf(context.sender)>-1), "You've not joined to bid on this yet");
     //check if the item is in bid time or not
     const end_time = u128.add(auction_item.start_time, auction_item.len_time);
-    if (u128.gt(u128.from(context.blockTimestamp), end_time) ||u128.gt(auction_item.start_time,u128.from(context.blockTimestamp))) {
-      logging.log("Not in the bid period: ".concat(item_code));
-    }
-    else {
-      let bidId = storage.getPrimitive<i32>("bidId", 0);
-      const joiner_bid = new JoinerBid(bidId,item_code,context.sender, bid_price, u128.from(context.blockTimestamp));
-      joiner_bids.set(joiner_bid.bid_id, joiner_bid);
-
-      bidId = bidId + 1;
-      storage.set<i32>("bidId", bidId);
-    }
+    assert( !(u128.gt(u128.from(context.blockTimestamp), end_time) 
+            ||u128.gt(auction_item.start_time,u128.from(context.blockTimestamp))), 
+      "Not in the bid period");
+    
+    let bidId = storage.getPrimitive<i32>("bidId", 0);
+    const joiner_bid = new JoinerBid(bidId,item_code,context.sender, bid_price, u128.from(context.blockTimestamp));
+    joiner_bids.set(joiner_bid.bid_id, joiner_bid);
+    bidId = bidId + 1;
+    storage.set<i32>("bidId", bidId);    
   }
 
   let results: JoinerBid[] = [];
@@ -151,3 +155,27 @@ export function cleanJoinerBids(): void {
   joiner_bids.clear();
 
 }
+
+export function payoutItem(item_code: string): void {
+  logging.log("Payout for the win item: ".concat(item_code));
+  
+  assert(list_auction_items.contains(item_code), "Item is not existed");
+  const auction_item = list_auction_items.get(item_code);
+  if (auction_item) {
+    //TODO: CHECK IF USER IS THE WINNER WITH HIGHEST PRICE
+    const values = joiner_bids.values();
+    let highest_price_price:u128 = new u128(0);
+    let highest_joiner:string='';
+    for (let i = 0; i < values.length; i++) {
+      if (item_code == values[i].item_code) {
+        if ( u128.gt(values[i].bid_price,highest_price_price) ){
+          highest_price_price = values[i].bid_price;
+          highest_joiner = values[i].joiner;
+        }
+      }
+    }
+    assert(!(highest_joiner==context.sender), "You are not the winner to payout");
+
+  }  
+}
+

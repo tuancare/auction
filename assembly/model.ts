@@ -108,7 +108,45 @@ export class AuctionItem {
     this.list_joiners=[];       
     return this;
   }
+
+  //update status 
+  public updateStatus(status:ItemStatus): AuctionItem {
+    this.status=status;
+    return this;
+  }
+
+
 }
+
+
+/** 
+ * Exporting a new class Transactions so it can be used outside of this file.
+ */
+ @nearBindgen
+ export class Transactions {
+  tran_id:i32;
+  item_code: string;  
+  sender: string;
+  tran_price: u128;
+  tran_time:u128;
+  desc:string;
+   constructor(
+    tran_id:i32,
+    item_code:string,
+    sender:string,
+    tran_price: u128,
+    tran_time: u128,
+    desc:string
+   ) {
+    this.tran_id = tran_id;
+    this.item_code = item_code;
+    this.sender = sender;
+    this.tran_price = tran_price;
+    this.tran_time = tran_time;
+    this.desc = desc;
+    
+   }
+ }
 /**
  * collections.vector is a persistent collection. Any changes to it will
  * be automatically saved in the storage.
@@ -116,4 +154,5 @@ export class AuctionItem {
  * It will be used as a prefix to all keys required to store data in the storage.
  */
 export const list_auction_items = new PersistentUnorderedMap<string, AuctionItem>("auc-item");
-export const joiner_bids = new PersistentUnorderedMap<i32, JoinerBid>("joiner-bid")
+export const joiner_bids = new PersistentUnorderedMap<i32, JoinerBid>("joiner-bid");
+export const trans_list = new PersistentUnorderedMap<i32, Transactions>("trans");
