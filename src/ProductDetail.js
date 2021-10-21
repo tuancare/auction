@@ -16,6 +16,7 @@ export default function Home() {
     }
     const [product, setProduct] = useState([]);
     const [list_bids, setList_bids] = useState([]);
+    const [list_joiners, setList_joiners] = useState([]);
     function useQuery() {
         return new URLSearchParams(useLocation().search);
       }
@@ -28,6 +29,7 @@ export default function Home() {
       getItem();
       return () => {
         setProduct({});
+        setList_joiners({});
       };
     }, []);
     useEffect(() => {
@@ -41,6 +43,8 @@ export default function Home() {
       contract.getItemByCode({ item_code:productcode}
           ).then(product => {
         setProduct(product); 
+        setList_joiners(product.list_joiners);
+        getlist_joiners();
         getlist_joiners(product);
         console.log(product);          
       });
@@ -81,11 +85,10 @@ export default function Home() {
       return highest_price.toFixed();
     }
 
-    function getlist_joiners(item){
-      console.log('aaaaaaaaa');
-      console.log(item.list_joiners);
-      var rows = [], i = 0, len = item.list_joiners.length;
-      while (++i <= len) rows.push(item.list_joiners[i]);
+    function getlist_joiners(){
+      
+      var rows = [], i = 0, len = list_joiners.length;
+      while (++i <= len) rows.push(list_joiners[i]);
 
       xxx=(
         <ul>
@@ -94,6 +97,7 @@ export default function Home() {
               })}
         </ul>
     )
+    console.log(xxx);
     return xxx;
     }
 
@@ -145,8 +149,11 @@ export default function Home() {
         </div>
         <div className="joiner-and-bid">
           <div className="products-item-bidders">
-          {product.list_joiners}
-          
+          <ul>
+          {list_joiners.map(function(name, index){
+                return <li key={ index }>{name}</li>;
+              })}
+          </ul>
           </div>        
           <div className="joiner-bid-container">
             <div className="bid-area">
