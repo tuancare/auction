@@ -34,7 +34,7 @@ async function initContract() {
     // View methods are read-only – they don't modify the state, but usually return some value
     viewMethods: ['getMessages','getItems','getCountJoiner','getJoinerBids','getItemByCode','getJoinerBidById'],
     // Change methods can modify the state, but you don't receive the returned value when called
-    changeMethods: ['joinItem','bidOnItem','addNewItem','bidProduct','cleanJoiner','cleanItems','cleanJoinerBids'],
+    changeMethods: ['joinItem','bidOnItem','addNewItem','bidProduct','cleanJoiner','cleanItems','cleanJoinerBids','payoutItem','refundItem','cleanTrans'],
     // Sender is the account ID to initialize transactions.
     // getAccountId() will return empty string if user is still unauthorized
     sender: walletConnection.getAccountId()

@@ -187,3 +187,29 @@ button {
 .pdp-bid-btn {
   width:30%;
 }
+.bid-joiner-name {
+  float:left;
+  font-weight: bold;
+  color: #d15454;
+  font-size: 26px;
+}
+.bid-joiner-price {
+  float:right;
+  color: #d15454;
+  font-size: 26px;
+}
+.bid-joiner-time {
+  clear:both;
+  display: block;
+  font-size: 16px;
+  padding-top: 10px;
+}
+.joiner-bid-list-item {
+  padding: 10px;
+  border-bottom: 1px dashed #d5d3d3;
+}
+.pdp-refund-btn {
+  font-size: 12px;
+  padding: 3px;
+  margin-left: 10px;
+}

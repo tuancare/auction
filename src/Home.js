@@ -26,12 +26,13 @@ export default function Home() {
     
     function onJoinItem(item_code,base_price,list_joiners){      
       console.log('Join item to bid: '+item_code)
-      if (isJoined(window.currentUser.accountId,list_joiners)){
-        console.log('You are already joined')
-        return;
-      }
+      //if (isJoined(window.currentUser.accountId,list_joiners)){
+      //  console.log('You are already joined')
+        //TODO: FIX THIS BUGGGGGGGGGG
+      //  return;
+      //}
       window.contract.joinItem(
-        { item_code:item_code},
+        { item_code:item_code,join_price:Big(base_price).div(10).plus(Big(5*10**23)).toFixed()},
         BOATLOAD_OF_GAS,
         Big(base_price).div(10).plus(Big(5*10**23)).toFixed() //10% pre-paid + 0.5N fee to join        
       ).then(() => {          
@@ -74,7 +75,7 @@ export default function Home() {
               {Big(product.base_price || '0').div(10 ** 24).toFixed()}(N)
               </div>
               <div className="products-item-bidders">
-              {product.list_joiners}
+              {product.list_joiners.length} joiners
               </div>
               <button 
                 id={"btn-bid-"+i} 

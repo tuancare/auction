@@ -7,6 +7,13 @@ export enum ItemStatus {
   Refunded  
 }
 
+export enum TranStatus {
+  Join,
+  Payout,  
+  Refund,
+  Other  
+}
+
 /** 
  * Exporting a new class AuctionContract so it can be used outside of this file.
  */
@@ -129,13 +136,16 @@ export class AuctionItem {
   sender: string;
   tran_price: u128;
   tran_time:u128;
+  tran_type:TranStatus;
   desc:string;
+
    constructor(
     tran_id:i32,
     item_code:string,
     sender:string,
     tran_price: u128,
     tran_time: u128,
+    tran_type:TranStatus,
     desc:string
    ) {
     this.tran_id = tran_id;
@@ -143,6 +153,7 @@ export class AuctionItem {
     this.sender = sender;
     this.tran_price = tran_price;
     this.tran_time = tran_time;
+    this.tran_type = tran_type;
     this.desc = desc;
     
    }

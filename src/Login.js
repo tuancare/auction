@@ -43,13 +43,18 @@ export default function Home() {
                 ? <button onClick={signOut}>Log out</button>
                 : <button onClick={signIn}>Log in</button>
                 }
-            </header>      
-            <button type="button" onClick={onClearItems}>
-                Clear all items
-            </button>
-            <button type="button" onClick={onClearBids}>
-            Clear all Bids
-            </button>
+            </header>    
+            { //window.currentUser.accountId== 'tuanlv.testnet'? //cheat abit, TODO: UPDATE LATER   
+            <>
+              <button type="button" onClick={onClearItems}>
+                  Clear all items
+              </button>
+              <button type="button" onClick={onClearBids}>
+              Clear all Bids
+              </button>
+            </>
+            //:''
+            }
         </main> 
     );
 }

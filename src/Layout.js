@@ -39,7 +39,7 @@ export default function Layout({ contract, currentUser, nearConfig, wallet }) {
                 <div className="header-account">
                     {!window.currentUser
                         ?<a href="#" onClick={signIn}>Login</a>
-                        :<a href="#" onClick={signOut}>Logout</a>
+                        :<span>Hi <a href="#" onClick={signOut}> | Logout</a></span>
                     }
                 </div>
             </div>

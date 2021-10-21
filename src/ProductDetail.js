@@ -3,6 +3,7 @@ import NewProduct from './components/NewProduct';
 import Big from 'big.js';
 import moment from 'moment';
 import timezone from 'moment-timezone'
+const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
 
 import {
     BrowserRouter as Router,
@@ -57,7 +58,8 @@ export default function Home() {
         
     });
     }
-      const onBid = (e) => {
+
+  const onBid = (e) => {
         e.preventDefault();
     
         
@@ -71,7 +73,27 @@ export default function Home() {
             
         });
       };
-    const get_highest_price= () => {
+  const onPayout = (item_code,base_price) => {        
+        const highest_price =get_highest_price();
+        const ten_per_base_price = Big(base_price).div(10).toFixed() ;
+        window.contract.payoutItem(
+          { item_code:item_code,payout_price:Big(highest_price).times(10**24).minus(ten_per_base_price).toFixed()},
+          BOATLOAD_OF_GAS,
+          Big(highest_price).times(10**24).minus(ten_per_base_price).toFixed()         
+        ).then(() => {          
+            
+        });
+      };
+  const onRefund = (item_code,joiner,base_price) => {                
+        window.contract.refundItem(
+          { item_code:item_code,joiner:joiner,refund_price:Big(base_price).div(10).toFixed() },
+          BOATLOAD_OF_GAS,
+          Big(base_price).div(10).toFixed()         
+        ).then(() => {          
+            
+        });
+      };
+  const get_highest_price= () => {
       highest_price=0;
       for(var i=0;i< list_bids.length;i++) {          
         var bprice = new Big(list_bids[i].bid_price||'0').div(10**24);
@@ -129,7 +151,7 @@ export default function Home() {
                   <span className="pdp-field-title">Period: </span>{ Big(product.len_time|| '0').div(60*10**9).toFixed() } (mins)
                 </div>
                 <div className="product-status pdp-line">
-                  <span className="pdp-field-title">Status: </span>
+                  <span className="pdp-field-title">Status: {product.status}</span>
                 </div>
                 <div className="product-highest-price pdp-line">
                   <span className="pdp-field-title">Highest bid price:</span>
@@ -137,6 +159,10 @@ export default function Home() {
                     {get_highest_price() } (N) 
                     {highest_price_joiner}
                   </span>
+                  { ('('+window.currentUser.accountId+')')== highest_price_joiner  && product.status!=2? 
+                    <button className="payout" id="btn-pay" href="#" onClick={() => { onPayout(product.item_code,product.base_price) }}> Payout</button>:
+                  ''
+                  }
                 </div>
               </div>
               
@@ -151,7 +177,14 @@ export default function Home() {
           <div className="products-item-bidders">
           <ul>
           {list_joiners.map(function(name, index){
-                return <li key={ index }>{name}</li>;
+                return <li key={ index }>{name}
+                        { product.status==2 && window.currentUser.accountId== product.owner? 
+                          <button className="pdp-refund-btn" type="button" onClick={onRefund(product.item_code,name,product.base_price)}>
+                              Refund
+                          </button>
+                        :''
+                        }
+                        </li>;
               })}
           </ul>
           </div>        
@@ -167,14 +200,17 @@ export default function Home() {
                       type="number" required />
                       (N)
                 </div>
+                { product.status!=2? 
                 <button className="pdp-bid-btn" type="button" onClick={onBid}>
                     Bid
                 </button>
+                :''
+                }
             </div>
             <div className="joiner-bid-list">
             {list_bids.map((joiner_bid, j) =>
               
-              <div key={j} className={j+ " products-item "+ joiner_bid.bid_id} >              
+              <div key={j} className={j+ " joiner-bid-list-item "+ joiner_bid.bid_id} >              
                   <div className="bid-joiner-name">
                   {joiner_bid.joiner}
                   </div>

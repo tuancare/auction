@@ -13,7 +13,7 @@ const items = [
     },
     {
         path: '/contact',
-        text: 'Contact'
+        text: 'Rules'
     }
     ,
     {
