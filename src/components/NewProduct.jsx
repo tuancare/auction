@@ -5,7 +5,7 @@ import DateTimePicker from 'react-datetime-picker';
 
 export default function NewProduct({ onSubmit}) {
   const [value, onChange] = useState(new Date());
-  
+  let value1=new Date();
   return (
     <div>
     <form onSubmit={onSubmit}>

@@ -5,6 +5,7 @@ import moment from 'moment';
 import timezone from 'moment-timezone'
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
 
+
 import {
     BrowserRouter as Router,
     Link,
@@ -93,7 +94,7 @@ export default function Home() {
   const onRefund = (item_code,joiner,base_price) => {                
         window.contract.refundItem(
           { item_code:item_code,joiner:joiner,refund_price:Big(base_price).div(10).toFixed() },
-          100,
+          BOATLOAD_OF_GAS,
           Big(base_price).div(10).toFixed()         
         ).then(() => {          
             
@@ -120,7 +121,32 @@ export default function Home() {
       }
       return false;
     }
-
+    function renderStatus(status) {
+      
+      switch(status) {
+        case 0:
+          return 'Init';
+        case 1:
+          return 'Open';
+        case 2:
+            return 'Closed';
+        default:
+          return 'Init';
+      }
+    }
+    function renderTranType(status) {
+      
+      switch(status) {
+        case 0:
+          return 'Join';
+        case 1:
+          return 'Payout';
+        case 2:
+            return 'Refund';
+        default:
+          return 'Join';
+      }
+    }
     return (
         <main>
         <header>            
@@ -143,13 +169,13 @@ export default function Home() {
                 </div>
                 <div className="product-start-time pdp-line">
                   <span className="pdp-field-title">Start time: </span>
-                  { moment.unix(Big(product.start_time || '0').div(10**9).round(0,0).toFixed()).format() }
+                  { moment.unix(Big(product.start_time || '0').div(10**9).round(0,0).toFixed()).format('MM/DD/yyyy HH:mm:ss') }
                 </div>
                 <div className="product-period pdp-line">
                   <span className="pdp-field-title">Period: </span>{ Big(product.len_time|| '0').div(60*10**9).toFixed() } (mins)
                 </div>
                 <div className="product-status pdp-line">
-                  <span className="pdp-field-title">Status: {product.status}</span>
+                  <span className="pdp-field-title">Status: {renderStatus(product.status)}</span>
                 </div>
                 <div className="product-highest-price pdp-line">
                   <span className="pdp-field-title">Highest bid price:</span>
@@ -185,6 +211,36 @@ export default function Home() {
                         </li>;
               })}
           </ul>
+          </div>
+          <div className="pdp-item-bidders">
+            <div className="joiner-area">
+                  TRANSACTIONS
+            </div>
+          
+          {list_trans.map((trans, j) =>
+                <div key={j} className={j+ " trans-list-item "+ trans.tran_id} >
+                    <div className="pdp-tran-title">
+                      <span className="pdp-tran-sender">
+                      {trans.sender}
+                      </span>
+                      <span className="pdp-tran-type">
+                      {renderTranType(trans.tran_type)} 
+                      </span>
+                      <span className="pdp-tran-price">                    
+                      {Big(trans.tran_price || '0').div(10 ** 24).toFixed()}Ⓝ
+                      </span>
+                    </div>
+                    
+                    <div className="pdp-tran-time">
+                    {moment.unix(Big(trans.tran_time || '0').div(10**9).round(0,0).toFixed()).format('MM/DD/yyyy HH:mm:ss')}
+                    </div>
+                    
+                    <div className="pdp-tran-desc">
+                    {trans.desc}
+                    </div>
+                </div>
+              )}
+          
           </div>        
           <div className="joiner-bid-container">
             <div className="bid-area">
@@ -217,7 +273,7 @@ export default function Home() {
                   </div>
                   <div className="bid-joiner-time">
                   {                
-                    moment.unix(Big(joiner_bid.bid_time || '0').div(10**9).round(0,0).toFixed()).format()
+                    moment.unix(Big(joiner_bid.bid_time || '0').div(10**9).round(0,0).toFixed()).format('MM/DD/yyyy HH:mm:ss')
                   }
                   </div>
                   

@@ -172,7 +172,7 @@ button {
   width: 49%;
 }
 .pdp-item-bidders {
-  width: 49%;
+  width: 24%;
   box-shadow: 0px 3px 6px #888888;
   margin-right: 1%;
   padding:15px;
@@ -251,4 +251,21 @@ button {
   color: #d15454;
   font-size: 20px;
   font-weight: bold;
+}
+.pdp-tran-sender {
+  font-weight: bold;
+}
+.pdp-tran-price, .pdp-tran-type  {
+  float:right;
+  font-size: 14px; 
+}
+.trans-list-item {
+  padding:5px;
+  border:1px dashed  #d5d3d3;
+}
+.trans-list-item span {
+  font-size: 14px;  
+}
+.pdp-tran-time, .pdp-tran-desc {
+  font-size: 14px;  
 }

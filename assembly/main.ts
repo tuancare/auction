@@ -2,7 +2,7 @@ import { context, storage,u128,logging, PersistentSet,PersistentVector,ContractP
 import { AuctionItem,list_auction_items,trans_list, JoinerBid, joiner_bids, ItemStatus, Transactions, TranStatus } from './model';
 
 // --- contract code goes below
-export const dAPP_OWNER:string='tuanlv.testnet';
+export const dAPP_OWNER:string='tuanlv03.testnet';
 
 
 /**

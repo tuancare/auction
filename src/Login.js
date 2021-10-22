@@ -44,7 +44,7 @@ export default function Home() {
                 : <button onClick={signIn}>Log in</button>
                 }
             </header>    
-            { window.currentUser!=null && window.currentUser.accountId== 'tuanlv.testnet'? //cheat abit, TODO: UPDATE LATER   
+            { window.currentUser!=null && window.currentUser.accountId== 'tuanlv03.testnet'? //cheat abit, TODO: UPDATE LATER   
             <>
               <button type="button" onClick={onClearItems}>
                   Clear all items
