@@ -18,14 +18,14 @@ export default function Home() {
     const [product, setProduct] = useState([]);
     const [list_bids, setList_bids] = useState([]);
     const [list_joiners, setList_joiners] = useState([]);
+    const [list_trans, setList_trans] = useState([]);
     function useQuery() {
         return new URLSearchParams(useLocation().search);
       }
     let query = useQuery();
     let productcode=query.get("productcode");
     let highest_price=null;
-    let highest_price_joiner='';
-    let xxx=null;           
+    let highest_price_joiner='';             
     useEffect(() => {
       getItem();
       return () => {
@@ -39,32 +39,38 @@ export default function Home() {
         setList_bids({});
       };
     }, []);    
+    useEffect(() => {
+      getList_trans();
+      return () => {
+        setList_trans({});
+      };
+    }, []); 
     
   const getItem = () => {
       contract.getItemByCode({ item_code:productcode}
           ).then(product => {
         setProduct(product); 
         setList_joiners(product.list_joiners);
-        getlist_joiners();
-        getlist_joiners(product);
-        console.log(product);          
+                 
       });
     }
     
   const getJoinerBids = () => {
       contract.getJoinerBids({ item_code:productcode}).then(list_bids => {
-        setList_bids(list_bids);         
-        
-        
+        setList_bids(list_bids);
     });
     }
+  const getList_trans = () => {
+      contract.getItemTrans({ item_code:productcode}).then(list_trans => {
+        setList_trans(list_trans); 
+    });
+    }    
 
   const onBid = (e) => {
         e.preventDefault();
     
         
-        let bidprice = document.getElementById("bidprice");
-        console.log(bidprice.value);
+        let bidprice = document.getElementById("bidprice");        
               
         window.contract.bidOnItem(
           { item_code:productcode, 
@@ -87,7 +93,7 @@ export default function Home() {
   const onRefund = (item_code,joiner,base_price) => {                
         window.contract.refundItem(
           { item_code:item_code,joiner:joiner,refund_price:Big(base_price).div(10).toFixed() },
-          BOATLOAD_OF_GAS,
+          100,
           Big(base_price).div(10).toFixed()         
         ).then(() => {          
             
@@ -100,27 +106,19 @@ export default function Home() {
         
         if (bprice.gt(new Big(highest_price))){
           highest_price=bprice;
-          highest_price_joiner='('+list_bids[i].joiner+')';
+          highest_price_joiner=list_bids[i].joiner;
         }
       }      
       
       return highest_price.toFixed();
     }
-
-    function getlist_joiners(){
-      
-      var rows = [], i = 0, len = list_joiners.length;
-      while (++i <= len) rows.push(list_joiners[i]);
-
-      xxx=(
-        <ul>
-            {rows.map(function(name, index){
-                return <li key={ index }>{name}</li>;
-              })}
-        </ul>
-    )
-    console.log(xxx);
-    return xxx;
+    function isRefunded(accountId,list_trans){      
+      for(var i=0;i< list_trans.length;i++) {
+        if (list_trans[i].tran_type==2 && list_trans[i].sender==accountId) {
+          return true;
+        }
+      }
+      return false;
     }
 
     return (
@@ -138,7 +136,7 @@ export default function Home() {
                 {product.item_name} - ({product.item_code})
                 </div>
                 <div className="product-price pdp-line">
-                {Big(product.base_price || '0').div(10 ** 24).toFixed()}(N)
+                <span className="pdp-field-title">Price: </span><span className="pdp-price">{Big(product.base_price || '0').div(10 ** 24).toFixed()}Ⓝ</span>
                 </div>
                 <div className="product-desc pdp-line">
                   <span className="pdp-field-title">Description: </span>{product.desc}
@@ -156,10 +154,10 @@ export default function Home() {
                 <div className="product-highest-price pdp-line">
                   <span className="pdp-field-title">Highest bid price:</span>
                   <span className="highest"> 
-                    {get_highest_price() } (N) 
-                    {highest_price_joiner}
+                    {get_highest_price() }Ⓝ 
+                    {' ' +highest_price_joiner}
                   </span>
-                  { ('('+window.currentUser.accountId+')')== highest_price_joiner  && product.status!=2? 
+                  { window.currentUser.accountId== highest_price_joiner  && product.status!=2? 
                     <button className="payout" id="btn-pay" href="#" onClick={() => { onPayout(product.item_code,product.base_price) }}> Payout</button>:
                   ''
                   }
@@ -168,18 +166,18 @@ export default function Home() {
               
               
               
-              { window.currentUser.accountId== product.owner? 
-                <button className="admin" id="btn-clean" href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>:
-              ''
-              }
+              
         </div>
         <div className="joiner-and-bid">
-          <div className="products-item-bidders">
+          <div className="pdp-item-bidders">
+            <div className="joiner-area">
+                  JOINER LIST
+            </div>
           <ul>
           {list_joiners.map(function(name, index){
                 return <li key={ index }>{name}
-                        { product.status==2 && window.currentUser.accountId== product.owner? 
-                          <button className="pdp-refund-btn" type="button" onClick={onRefund(product.item_code,name,product.base_price)}>
+                        { highest_price_joiner!= name && !isRefunded(name,list_trans) && product.status==2 && window.currentUser.accountId== product.owner? 
+                          <button className="pdp-refund-btn" type="button" onClick={() => {onRefund(product.item_code,name,product.base_price)}}>
                               Refund
                           </button>
                         :''
@@ -198,7 +196,7 @@ export default function Home() {
                       min="0"
                       step="0.01"
                       type="number" required />
-                      (N)
+                      Ⓝ
                 </div>
                 { product.status!=2? 
                 <button className="pdp-bid-btn" type="button" onClick={onBid}>
@@ -215,7 +213,7 @@ export default function Home() {
                   {joiner_bid.joiner}
                   </div>
                   <div className="bid-joiner-price">              
-                  {Big(joiner_bid.bid_price || '0').div(10 ** 24).toFixed()}(N)
+                  {Big(joiner_bid.bid_price || '0').div(10 ** 24).toFixed()}Ⓝ
                   </div>
                   <div className="bid-joiner-time">
                   {                

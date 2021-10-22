@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  font-size: 16px;
 }
 
 html {
@@ -126,6 +127,8 @@ button {
 }
 .pdp-right {
   width:50%;
+  box-shadow: 0px 3px 6px #888888;
+  padding: 15px;
 }
 .product-img { 
   width:100%;
@@ -136,7 +139,7 @@ button {
   margin:0 auto;
 }
 .product-name {
-  color: black;
+  color: #0a94ff;
   font-weight: bolder;
   text-transform: uppercase;
   font-size: 35px;
@@ -162,14 +165,19 @@ button {
 }
 .joiner-and-bid {
   clear: both;
-  display: flex;
-  padding: 15px;
-  border-top: 1px dashed #d1d1d1;
+  display: flex;  
   margin-top: 20px;
 }
 .products-item-bidders {
-  width: 50%;
+  width: 49%;
 }
+.pdp-item-bidders {
+  width: 49%;
+  box-shadow: 0px 3px 6px #888888;
+  margin-right: 1%;
+  padding:15px;
+}
+
 .joiner-bid-container {
   width: 50%;
   box-shadow: 0px 3px 6px #888888;
@@ -212,4 +220,35 @@ button {
   font-size: 12px;
   padding: 3px;
   margin-left: 10px;
+}
+.products-item-name a{
+  text-decoration: none;  
+  font-size: 20px;
+  font-weight: bold;
+  color: #0a94ff;
+  text-transform: uppercase;  
+}
+.products-item-bottom {
+  width: 100%;
+}
+.products-item-bottom-l {
+  width: 50%;
+  float: left;
+}
+.join-btn {
+  float:right;
+}
+.pdp-price {
+  color: #d15454;
+  font-size: 20px;
+  font-weight: bold;
+}
+.joiner-area {
+  border-bottom: 1px dashed #d5d3d3;
+  padding: 13px;
+}
+.products-item-price {
+  color: #d15454;
+  font-size: 20px;
+  font-weight: bold;
 }

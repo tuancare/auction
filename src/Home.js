@@ -19,8 +19,7 @@ export default function Home() {
     }, []);
     const getItems = () => {
       contract.getItems().then(products => {
-        setProducts(products); 
-        console.log(products);        
+        setProducts(products);                
       });
     }
     
@@ -69,25 +68,25 @@ export default function Home() {
               {product.desc}
               </div>
               <div className="products-item-img">
-                <img src={product.url}/>
+              <a href={"/pdp/code?productcode="+product.item_code}><img src={product.url}/></a>
               </div>
-              <div className="products-item-price">
-              {Big(product.base_price || '0').div(10 ** 24).toFixed()}(N)
+              <div className="products-item-bottom">
+                <div className="products-item-bottom-l">
+                  <div className="products-item-price">
+                  {Big(product.base_price || '0').div(10 ** 24).toFixed()}Ⓝ
+                  </div>
+                  <div className="products-item-bidders">
+                  {product.list_joiners.length} joiners
+                  </div>
+                </div>
+                <button className="join-btn"
+                  id={"btn-bid-"+i} 
+                  onClick={() => { onJoinItem(product.item_code,product.base_price,product.list_joiners) }}
+                  title="You will be charged 0.5N as fee, plus 10% of base price as prepaid (will be refunded 10% if not win the item)"
+                > 
+                  Join to Bid
+                </button>
               </div>
-              <div className="products-item-bidders">
-              {product.list_joiners.length} joiners
-              </div>
-              <button 
-                id={"btn-bid-"+i} 
-                onClick={() => { onJoinItem(product.item_code,product.base_price,product.list_joiners) }}
-                title="You will be charged 0.5N as fee, plus 10% of base price as prepaid (will be refunded 10% if not win the item)"
-              > 
-                Join to Bid
-              </button>
-              { window.currentUser.accountId== product.owner? 
-                <button className="admin" id={"btn-bid-"+i} href="#" onClick={() => { onCleanJoiner(product.item_code) }}> Clean Joiners</button>:
-              ''
-              }
           </div>
           )}
           </div>

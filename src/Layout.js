@@ -37,14 +37,17 @@ export default function Layout({ contract, currentUser, nearConfig, wallet }) {
                     best bid, best buy
                 </div>
                 <div className="header-account">
-                    {!window.currentUser
-                        ?<a href="#" onClick={signIn}>Login</a>
-                        :<span>Hi <a href="#" onClick={signOut}> | Logout</a></span>
+                    {window.currentUser==null
+                        ?<a href="#" onClick={signIn}>Login</a> 
+                        :<span>Hi {window.currentUser.accountId}<a href="#" onClick={signOut}> | Logout</a></span>
                     }
                 </div>
             </div>
             <div className="app">
                 <div className="app__sidebar">
+                    <div className="near-icon">
+                    
+                    </div>
                     <Menu />
                 </div>
                 <main className="app__content">

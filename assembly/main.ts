@@ -58,10 +58,20 @@ export function joinItem(item_code:string,join_price:u128 ): AuctionItem | null 
     const end_time = u128.add(auction_item.start_time, auction_item.len_time);
     assert( !(u128.gt(u128.from(context.blockTimestamp), end_time)), "This auction session is ended");
 
+    //check if user has joined or not
+    let isExist=false;
+    for (let i = 0; i < auction_item.list_joiners.length; i++) {
+      if (context.sender == auction_item.list_joiners[i]) {
+        isExist=true;
+        break;
+      }
+    }
+    assert(!isExist, "You had joined before.");
+
     const updated = auction_item.join();
     list_auction_items.set(updated.item_code, updated);
     
-    //TODO: log the transaction to list
+    //log the transaction to list
     let transId = storage.getPrimitive<i32>("transId", 0);
     const trans = new Transactions(transId,item_code,context.sender,join_price,u128.from(context.blockTimestamp),TranStatus.Join,'Join an item');
     trans_list.set(trans.tran_id, trans);
@@ -144,6 +154,9 @@ export function bidOnItem(item_code: string, bid_price: u128): JoinerBid[] {
             ||u128.gt(auction_item.start_time,u128.from(context.blockTimestamp))), 
       "Not in the bid period");
     
+    //check if bid price less than base_price
+    assert( !u128.gt(auction_item.base_price, bid_price) ,"Bid price must higher than base price");
+
     let bidId = storage.getPrimitive<i32>("bidId", 0);
     const joiner_bid = new JoinerBid(bidId,item_code,context.sender, bid_price, u128.from(context.blockTimestamp));
     joiner_bids.set(joiner_bid.bid_id, joiner_bid);
@@ -215,7 +228,7 @@ export function payoutItem(item_code: string,payout_price: u128): void {
   assert(list_auction_items.contains(item_code), "Item is not existed");
   const auction_item = list_auction_items.get(item_code);
   if (auction_item) {
-    //TODO: CHECK IF USER IS THE WINNER WITH HIGHEST PRICE
+    //CHECK IF USER IS THE WINNER WITH HIGHEST PRICE
     const values = joiner_bids.values();
     let highest_price_price:u128 = new u128(0);
     let highest_joiner:string='';
@@ -228,10 +241,15 @@ export function payoutItem(item_code: string,payout_price: u128): void {
       }
     }
     assert((highest_joiner==context.sender), "You are not the winner to payout");
+
+    //check if item still in bidding time
+    const end_time = u128.add(auction_item.start_time, auction_item.len_time);
+    assert( !u128.lt(u128.from(context.blockTimestamp), end_time), "Auction not started or still in period");
+
     //update status of Item
     const updated = auction_item.updateStatus(ItemStatus.Close);
     list_auction_items.set(updated.item_code, updated);
-    //TODO: log the transaction to list
+    //log the transaction to list
     let transId = storage.getPrimitive<i32>("transId", 0);
     const trans = new Transactions(transId,item_code,context.sender,payout_price,u128.from(context.blockTimestamp),TranStatus.Payout,'Pay for an item');
     trans_list.set(trans.tran_id, trans);
@@ -239,6 +257,7 @@ export function payoutItem(item_code: string,payout_price: u128): void {
     storage.set<i32>("transId", transId); 
   }  
 }
+
 /**
 * Owner refund N to the bidders who did not win the auction
 */
@@ -263,7 +282,7 @@ export function refundItem(item_code: string, joiner:string, refund_price: u128)
     assert(!(highest_joiner==joiner), "Joiner is the winner, can't be refund.");
 
 
-    //TODO: check if user has been refunded or not
+    //check if user has been refunded or not
     const trans_list_values = trans_list.values();
     let isExist=false;
     for (let i = 0; i < trans_list_values.length; i++) {
@@ -274,12 +293,33 @@ export function refundItem(item_code: string, joiner:string, refund_price: u128)
     }
     assert(!isExist, "Joiner has been refunded before.");
 
-    //TODO: log the transaction to list
+    //log the transaction to list
     let transId = storage.getPrimitive<i32>("transId", 0);
     const trans = new Transactions(transId,item_code,joiner,refund_price,u128.from(context.blockTimestamp),TranStatus.Refund,'Refund for an item');
     trans_list.set(trans.tran_id, trans);
     transId = transId + 1;
     storage.set<i32>("transId", transId);
   }  
+}
+
+/**
+* Get all trans of an item
+*/
+export function getItemTrans(item_code: string): Transactions[] {
+  logging.log("Get all trans of an item: ".concat(item_code));
+  assert(list_auction_items.contains(item_code), "Item is not existed");
+
+  let results: Transactions[] = [];
+  const auction_item = list_auction_items.get(item_code);
+  if (auction_item != null) {
+    const values = trans_list.values();
+    for (let i = 0; i < values.length; i++) {
+      if (item_code == values[i].item_code) {
+        results.push(values[i]);
+      }
+    }
+  }
+
+  return results;
 }
 
